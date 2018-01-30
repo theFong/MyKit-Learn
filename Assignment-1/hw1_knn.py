@@ -4,7 +4,6 @@ from typing import List, Callable
 
 import numpy
 import scipy
-import sklearn
 
 
 ############################################################################
@@ -27,4 +26,3 @@ class KNN:
 if __name__ == '__main__':
     print(numpy.__version__)
     print(scipy.__version__)
-    print(sklearn.__version__)
