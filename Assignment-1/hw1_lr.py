@@ -20,23 +20,55 @@ class LinearRegression:
         # use LMS(least mean squared(minimizing residuals sum(mean squared error)))
         # LMS = ((X^tX)^-1) (X^tY) (X^tX -> X^tX + lI)
         # make sure N > D+1
-        # features ~ X values ~ y
+        # features = X values = y
         y = numpy.array([values]).transpose()
         x = numpy.array(features)
-        # to add w0
+
+        # add w0
         x = numpy.append([[1]]*len(features),x, axis=1)
+
+        # if poly feature > 1
+        if self.nb_features > 1:
+            
+            toBeAppended = []
+            # for all the data points
+            for i in x:
+                # for all the features
+                # return [x^2 ... X^D]
+                aug = self.phi(i)
+                toBeAppended.append(aug)
+            # add all [x^2..x^D] to x
+            x = numpy.append(x,numpy.array(toBeAppended),axis=1)
+
 
         xtx = x.transpose().dot(x)
         xty = x.transpose().dot(y)
         xtxInv = numpy.linalg.inv(xtx)
         self.weights = xtxInv.dot(xty)
-        
+       
+    def phi(self, x: List[float]) -> List[float]:
+        aug = []
+        for i in range(1,len(x)):
+            for k in range(2,self.nb_features+1):
+                aug.append(numpy.power(x[i],k))
+        return aug
 
     def predict(self, features: List[List[float]]) -> List[float]:
         # f(x) = wtx
         # x -> p(x) [1,x,x^2...x^d]
         x = numpy.array(features)
         x = numpy.append([[1]]*len(features),x, axis=1)
+
+        if self.nb_features > 1:
+            
+            toBeAppended = []
+            # for all the data points
+            for i in x:
+                # for all the features
+                # return [x^2 ... X^D]
+                aug = self.phi(i)
+                toBeAppended.append(aug)
+            x = numpy.append(x,numpy.array(toBeAppended), axis=1)
         
         return numpy.inner(self.weights.transpose(),x)[0]
 
