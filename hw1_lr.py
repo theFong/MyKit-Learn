@@ -21,11 +21,10 @@ class LinearRegression:
         # LMS = ((X^tX)^-1) (X^tY) (X^tX -> X^tX + lI)
         # make sure N > D+1
         # features ~ X values ~ y
-        assert self.nb_features == len(features[0])
         y = numpy.array([values]).transpose()
         x = numpy.array(features)
         # to add w0
-        x = numpy.append(x, [[1]]*len(features), axis=1)
+        x = numpy.append([[1]]*len(features),x, axis=1)
 
         xtx = x.transpose().dot(x)
         xty = x.transpose().dot(y)
@@ -34,9 +33,12 @@ class LinearRegression:
         
 
     def predict(self, features: List[List[float]]) -> List[float]:
-        # f(x) = wx + w0
+        # f(x) = wtx
+        # x -> p(x) [1,x,x^2...x^d]
         x = numpy.array(features)
-        return numpy.add(numpy.dot(self.weights,x.transpose()), self.weights[1][0])[0]
+        x = numpy.append([[1]]*len(features),x, axis=1)
+        
+        return numpy.inner(self.weights.transpose(),x)[0]
 
     def get_weights(self) -> List[float]:
         """
