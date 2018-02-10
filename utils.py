@@ -16,9 +16,19 @@ def f1_score(real_labels: List[int], predicted_labels: List[int]) -> float:
     """
     f1 score: https://en.wikipedia.org/wiki/F1_score
     """
+    # precsion = true positives / positives pred
+    # recall = true positives classified / total positives 
+    # 2 * [ (precision * recall) / (precision + recall) ]
     assert len(real_labels) == len(predicted_labels)
+    truePositPred = sum(1 if (p == 1 and r == p) else 0 for r,p in zip(real_labels, predicted_labels))
+    positPred = sum(1 if p ==1 else 0 for p in predicted_labels)
+    precision = truePositPred / positPred
 
-    raise NotImplementedError
+    totalPosit = sum(1 if r == 1 else 0 for r in real_labels)
+    recall = truePositPred / totalPosit
+
+    return 2 * ((precision * recall) / (precision+recall))
+    
 
 
 def polynomial_features(
@@ -28,24 +38,30 @@ def polynomial_features(
 
 
 def euclidean_distance(point1: List[float], point2: List[float]) -> float:
-    # l2 norm
     assert(len(point1) == len(point2))
-    sum = 0
-    for p1, p2 in zip(point1, point2):
-        sum += np.power((p1-p2),2)
-    return np.power(sum,.5)
+    # d(x,y)=√⟨x−y)*(x−y⟩
+    x = np.array(point1)
+    y = np.array(point2)
 
-    
+    return np.power(np.subtract(x,y).dot(np.subtract(x,y)),.5)
 
 
 def inner_product_distance(point1: List[float], point2: List[float]) -> float:
-    raise NotImplementedError
-
+    assert len(point1) == len(point2)
+    # d(x,y)=⟨x,y⟩
+    x = np.array(point1)
+    y = np.array(point2)
+    return x.dot(y)
 
 def gaussian_kernel_distance(
         point1: List[float], point2: List[float]
 ) -> float:
-    raise NotImplementedError
+    # d(x,y)=exp(−1/2√⟨x−y,x−y⟩)
+    assert len(point1) == len(point2)
+    x = np.array(point1)
+    y = np.array(point2)
+    return numpy.exp(-.5 * numpy.power(numpy.subtract(x,y).dot(numpy.subtract(x,y),.5)))
+
 
 
 class NormalizationScaler:
