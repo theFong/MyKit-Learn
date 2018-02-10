@@ -28,7 +28,14 @@ def polynomial_features(
 
 
 def euclidean_distance(point1: List[float], point2: List[float]) -> float:
-    raise NotImplementedError
+    # l2 norm
+    assert(len(point1) == len(point2))
+    sum = 0
+    for p1, p2 in zip(point1, point2):
+        sum += np.power((p1-p2),2)
+    return np.power(sum,.5)
+
+    
 
 
 def inner_product_distance(point1: List[float], point2: List[float]) -> float:
