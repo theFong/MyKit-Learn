@@ -151,12 +151,6 @@ class LinearRegressionWithL2Loss:
         """
         return self.weights
 
-    def l2(self, w: List[float]) -> float:
-        sum = 0.0
-        for i in w:
-            sum = numpy.power(i,2)
-        return numpy.power(sum, .5)
-
 
 if __name__ == '__main__':
     print(numpy.__version__)
