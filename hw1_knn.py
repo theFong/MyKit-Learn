@@ -17,10 +17,40 @@ class KNN:
         self.distance_function = distance_function
 
     def train(self, features: List[List[float]], labels: List[int]):
-        raise NotImplementedError
+        assert len(features) == len(labels)
+        self.feature_and_label = list(zip(features,labels))
 
     def predict(self, features: List[List[float]]) -> List[int]:
-        raise NotImplementedError
+        # calculate nn for all many points
+        return list(map(self.nn,features))
+        	
+    def nn(self, new_f: List[float]) -> int:
+        # calculate nn for point
+        # calc distances sort take quorum based off K
+        distances = [self.distance(f,new_f) for f in self.feature_and_label]
+        distances = sorted(distances, key = lambda x: x[0])
+        
+        label_bucket = {0:0,1:0}
+        for i in range(0,self.k):
+            vote = distances[i][1]
+            if vote not in label_bucket:
+                label_bucket[vote] = 1
+            else:
+                label_bucket[vote] += 1
+
+        winner = max(label_bucket, key = label_bucket.get)
+        winner_count = label_bucket[winner]
+        # check to see if there is a tie
+        checkTie = sum(1 if v == winner_count else 0 for k,v in label_bucket.items())
+        # if tie call nn again with k-1
+        if checkTie > 1:
+            self.k -= 1
+            return self.nn(new_f)
+        else:
+            return winner
+
+    def distance(self, point: (List[float],int), new_p: List[float]):
+    	return (self.distance_function(point[0],new_p), point[1])
 
 
 if __name__ == '__main__':

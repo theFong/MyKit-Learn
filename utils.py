@@ -26,7 +26,8 @@ def f1_score(real_labels: List[int], predicted_labels: List[int]) -> float:
 
     totalPosit = sum(1 if r == 1 else 0 for r in real_labels)
     recall = truePositPred / totalPosit
-
+    if (precision + recall) == 0:
+        return 0
     return 2 * ((precision * recall) / (precision+recall))
     
 
@@ -60,7 +61,7 @@ def gaussian_kernel_distance(
     assert len(point1) == len(point2)
     x = np.array(point1)
     y = np.array(point2)
-    return numpy.exp(-.5 * numpy.power(numpy.subtract(x,y).dot(numpy.subtract(x,y),.5)))
+    return np.exp(-.5 * (np.power(np.subtract(x,y).dot(np.subtract(x,y)),.5)))
 
 
 
