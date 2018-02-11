@@ -22,16 +22,20 @@ class KNN:
 
     def predict(self, features: List[List[float]]) -> List[int]:
         # calculate nn for all many points
-        return list(map(self.nn,features))
+
+        return [ self.nn(f, self.k) for f in features ]
         	
-    def nn(self, new_f: List[float]) -> int:
+    def nn(self, new_f: List[float], k: int) -> int:
+        assert k > 0
         # calculate nn for point
         # calc distances sort take quorum based off K
         distances = [self.distance(f,new_f) for f in self.feature_and_label]
         distances = sorted(distances, key = lambda x: x[0])
         
         label_bucket = {0:0,1:0}
-        for i in range(0,self.k):
+        for i in range(0,k):
+            if i >= len(distances):
+                break
             vote = distances[i][1]
             if vote not in label_bucket:
                 label_bucket[vote] = 1
@@ -44,8 +48,7 @@ class KNN:
         checkTie = sum(1 if v == winner_count else 0 for k,v in label_bucket.items())
         # if tie call nn again with k-1
         if checkTie > 1:
-            self.k -= 1
-            return self.nn(new_f)
+            return self.nn(new_f,k-1)
         else:
             return winner
 

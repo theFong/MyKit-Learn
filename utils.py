@@ -2,6 +2,8 @@ from typing import List
 
 import numpy as np
 
+from sklearn.metrics import f1_score as f1_score_sk
+
 
 def mean_squared_error(y_true: List[float], y_pred: List[float]) -> float:
     assert len(y_true) == len(y_pred)
@@ -19,6 +21,7 @@ def f1_score(real_labels: List[int], predicted_labels: List[int]) -> float:
     # precsion = true positives / positives pred
     # recall = true positives classified / total positives 
     # 2 * [ (precision * recall) / (precision + recall) ]
+
     assert len(real_labels) == len(predicted_labels)
     truePositPred = sum(1 if (p == 1 and r == p) else 0 for r,p in zip(real_labels, predicted_labels))
     positPred = sum(1 if p ==1 else 0 for p in predicted_labels)
