@@ -75,7 +75,12 @@ class NormalizationScaler:
         if the input features = [[3, 4], [1, -1], [0, 0]],
         the output should be [[0.6, 0.8], [0.707107, -0.707107], [0, 0]]
         """
-        raise NotImplementedError
+        return [self.normalize(f) for f in features]
+
+    def normalize(self, f):
+        eu_dist = euclidean_distance([0]*len(f), f)
+        # iterate over all dimensions dividing by eu dist while checking for divide by 0
+        return [i / eu_dist if eu_dist != 0 else 0.0 for i in f]
 
 
 class MinMaxScaler:
@@ -107,7 +112,8 @@ class MinMaxScaler:
     """
 
     def __init__(self):
-        pass
+        self.min = []
+        self.max = []
 
     def __call__(self, features: List[List[float]]) -> List[List[float]]:
         """
@@ -115,4 +121,19 @@ class MinMaxScaler:
         if the input features = [[2, -1], [-1, 5], [0, 0]],
         the output should be [[1, 0], [0, 1], [0.333333, 0.16667]]
         """
-        raise NotImplementedError
+        features = np.array(features)
+        # find min and max if not inited
+        if len(self.min) == 0:
+            self.min = features.min(axis=0)
+        if len(self.max) == 0:
+            self.max = features.max(axis=0)
+
+        return [self.normalize(f) for f in features]
+
+    def normalize(self, f):
+        # iterate over all dimensions dividing by eu dist while checking for divide by 0
+        return [(x - mi) / (ma - mi) for x,mi,ma in zip(f,self.min,self.max)]
+
+
+
+
