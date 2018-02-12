@@ -52,7 +52,7 @@ class Perceptron:
                 if pred_sign != y:
                     # if predicted label is wrong
                     # update rule -> Wnew = W + YX/|X|
-                    x_norm = np.power(sum([d**2 for d in x]),.5)
+                    x_norm = np.linalg.norm(x)
                     self.w = np.array(self.w) + ((y * x) / (x_norm + self.margin))
                     is_terminate = False
 
@@ -75,8 +75,7 @@ class Perceptron:
         # This should take a list of features and use the learned 
         # weights to predict the label
         ############################################################################
-        margin = np.inner(self.w.transpose(),features)
-        return np.sign(margin)
+        return np.sign(np.inner(self.w.transpose(),features))
 
 
     def get_weights(self) -> Tuple[List[float], float]:
