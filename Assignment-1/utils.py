@@ -66,7 +66,7 @@ def gaussian_kernel_distance(
     assert len(point1) == len(point2)
     x = np.array(point1)
     y = np.array(point2)
-    return np.exp(-.5 * (np.power(np.subtract(x,y).dot(np.subtract(x,y)),.5)))
+    return -np.exp(-.5 * (np.power(np.subtract(x,y).dot(np.subtract(x,y)),.5)))
 
 
 

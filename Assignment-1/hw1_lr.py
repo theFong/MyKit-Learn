@@ -27,20 +27,6 @@ class LinearRegression:
         # add w0
         x = numpy.append([[1]]*len(features),x, axis=1)
 
-        # if poly feature > 1
-        # if self.nb_features > 1:
-            
-        #     toBeAppended = []
-        #     # for all the data points
-        #     for i in x:
-        #         # for all the features
-        #         # return [x^2 ... X^D]
-        #         aug = self.phi(i)
-        #         toBeAppended.append(aug)
-        #     # add all [x^2..x^D] to x
-        #     x = numpy.append(x,numpy.array(toBeAppended),axis=1)
-
-
         xtx = x.transpose().dot(x)
         xty = x.transpose().dot(y)
         xtxInv = numpy.linalg.inv(xtx)
