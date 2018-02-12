@@ -16,7 +16,7 @@ class Perceptron:
             many iterations even if it is not converged 
             margin is the min value, we use this instead of comparing with 0 in the algorithm
         '''
-        
+        # number of classes
         self.nb_features = 2
         self.w = [0 for i in range(0,nb_features+1)]
         self.margin = margin
@@ -33,12 +33,31 @@ class Perceptron:
                 True/ False : return True if the algorithm converges else False. 
         '''
         ############################################################################
-        # TODO : complete this function. 
         # This should take a list of features and labels [-1,1] and should update 
         # to correct weights w. Note that w[0] is the bias term. and first term is 
         # expected to be 1 --- accounting for the bias
         ############################################################################
-        raise NotImplementedError
+        # iterate max_iteration times
+        is_terminate = False
+        for i in range(0,self.max_iteration):
+            # iterate over all features
+            if is_terminate:
+                return True
+            is_terminate = True
+            for x,y in zip(features, labels):
+                x = np.array(x)
+                pred = np.array(self.w).transpose().dot(x)
+                # cast to -1,1
+                pred_sign = np.sign(pred)
+                if pred_sign != y:
+                    # if predicted label is wrong
+                    # update rule -> Wnew = W + YX/|X|
+                    x_norm = np.power(sum([d**2 for d in x]),.5)
+                    self.w = np.array(self.w) + ((y * x) / (x_norm + self.margin))
+                    is_terminate = False
+
+        return False
+            
     
     def reset(self):
         self.w = [0 for i in range(0,self.nb_features+1)]
@@ -53,12 +72,12 @@ class Perceptron:
                 labels : List of integers of [-1,1] 
         '''
         ############################################################################
-        # TODO : complete this function. 
-        # This should take a list of features and labels [-1,1] and use the learned 
+        # This should take a list of features and use the learned 
         # weights to predict the label
         ############################################################################
-        
-        raise NotImplementedError
+        margin = np.inner(self.w.transpose(),features)
+        return np.sign(margin)
+
 
     def get_weights(self) -> Tuple[List[float], float]:
         return self.w

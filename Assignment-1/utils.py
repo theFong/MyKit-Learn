@@ -33,17 +33,19 @@ def f1_score(real_labels: List[int], predicted_labels: List[int]) -> float:
         return 0
     return 2 * ((precision * recall) / (precision+recall))
     
-
+def phi(f, k):
+    # yeah this is dirty
+    # for each dimension of feature, raise to power of 1..k
+    return [i**x for x in range(1,k+1) for i in f]
 
 def polynomial_features(
         features: List[List[float]], k: int
 ) -> List[List[float]]:
-    raise NotImplementedError
-
+    return [phi(f,k) for f in features]
 
 def euclidean_distance(point1: List[float], point2: List[float]) -> float:
     assert(len(point1) == len(point2))
-    # d(x,y)=√⟨x−y)*(x−y⟩
+    # d(x,y) = √⟨x−y)*(x−y⟩
     x = np.array(point1)
     y = np.array(point2)
 
@@ -52,7 +54,7 @@ def euclidean_distance(point1: List[float], point2: List[float]) -> float:
 
 def inner_product_distance(point1: List[float], point2: List[float]) -> float:
     assert len(point1) == len(point2)
-    # d(x,y)=⟨x,y⟩
+    # d(x,y) = ⟨x,y⟩
     x = np.array(point1)
     y = np.array(point2)
     return x.dot(y)
@@ -60,7 +62,7 @@ def inner_product_distance(point1: List[float], point2: List[float]) -> float:
 def gaussian_kernel_distance(
         point1: List[float], point2: List[float]
 ) -> float:
-    # d(x,y)=exp(−1/2√⟨x−y,x−y⟩)
+    # d(x,y) = exp(−1/2√⟨x−y,x−y⟩)
     assert len(point1) == len(point2)
     x = np.array(point1)
     y = np.array(point2)
@@ -134,7 +136,6 @@ class MinMaxScaler:
         return [self.normalize(f) for f in features]
 
     def normalize(self, f):
-        # iterate over all dimensions dividing by eu dist while checking for divide by 0
         return [(x - mi) / (ma - mi) for x,mi,ma in zip(f,self.min,self.max)]
 
 
