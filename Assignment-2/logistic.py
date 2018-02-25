@@ -44,8 +44,16 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
 
 
     """
-    TODO: add your code here
+    Stochastic gradient descent:
+    w  <- w - step_size * (sigmoid(W^tXn) - Yn) * Xn
     """
+
+    for it in range(0,max_iterations):
+        i = it % N
+        # calc h(x)
+        hx = sigmoid(w.T.dot(X[i]))
+        # update rule
+        w = w - step_size * (hx - y[i]) * (X[i])
 
     assert w.shape == (D,)
     return w, b
@@ -62,11 +70,16 @@ def binary_predict(X, w, b):
     """
     N, D = X.shape
     preds = np.zeros(N) 
+    w = np.array(w)
 
 
     """
-    TODO: add your code here
-    """      
+    h(x) = sigmoid(W^tX)
+    """    
+    print(w.shape, (X).shape)
+    preds = sigmoid(np.inner(w.T,(X)))
+    for i in range(len(preds)):
+        preds[i] = 1 if preds[i] > .5 else 0
     assert preds.shape == (N,) 
     return preds
 
@@ -295,11 +308,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.output:
-            sys.stdout = open(args.output, 'w')
+        sys.stdout = open(args.output, 'w')
 
     if not args.type or args.type == 'binary':
         run_binary()
 
     if not args.type or args.type == 'multiclass':
         run_multiclass()
-        
