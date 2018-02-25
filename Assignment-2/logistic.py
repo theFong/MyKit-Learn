@@ -76,10 +76,10 @@ def binary_predict(X, w, b):
     """
     h(x) = sigmoid(W^tX)
     """    
-    print(w.shape, (X).shape)
     preds = sigmoid(np.inner(w.T,(X)))
     for i in range(len(preds)):
         preds[i] = 1 if preds[i] > .5 else 0
+
     assert preds.shape == (N,) 
     return preds
 
@@ -124,12 +124,27 @@ def multinomial_train(X, y, C,
 
 
     """
-    TODO: add your code here
+    stochastic gradient descent:
+    Gn = exp(Wn^tX) / sum(exp(Wi^tX))
+    1 of k encoding
+    w <- w - step_size * Gn
     """
+    # 1 of k encoding
+    y = np.array([[1 if Yn == k else 0 for k in range(0,C)] for Yn in y])
+    # sgd
+    for it in range(0,max_iterations):
+        n = it % D
+        # calculate the gradients
+        G = np.array([ (prob_of_class(w,wk,X[n]) - yk) * (X[n]) for yk, wk in zip(y[n],w) ])
+        # update rule
+        w = w - step_size * G
 
     assert w.shape == (C, D)
     assert b.shape == (C,)
     return w, b
+
+def prob_of_class(W,Wk,Xn):
+    return ( np.exp(Wk.T.dot(Xn)) / np.sum([ np.exp(Wl.T.dot(Xn)) for Wl in W ]) )
 
 
 def multinomial_predict(X, w, b):
@@ -152,8 +167,11 @@ def multinomial_predict(X, w, b):
     preds = np.zeros(N) 
 
     """
-    TODO: add your code here
-    """   
+    argmax(W^tx)
+    """
+
+    softmax = np.inner(w,(X)).T
+    preds = np.array([ p.tolist().index(max(p)) for p in softmax ])
 
     assert preds.shape == (N,)
     return preds
@@ -276,17 +294,20 @@ def run_multiclass():
                 (toy_data_multiclass_5_classes(), 'Synthetic data', 5), 
                 (data_loader_mnist(), 'MNIST', 10)]
 
+    # datasets = [(toy_data_multiclass_3_classes_non_separable(), 
+    #                     'Synthetic data', 3)]
+
     for data, name, num_classes in datasets:
         print('%s: %d class classification' % (name, num_classes))
         X_train, X_test, y_train, y_test = data
         
-        print('One-versus-rest:')
-        w, b = OVR_train(X_train, y_train, C=num_classes)
-        train_preds = OVR_predict(X_train, w=w, b=b)
-        preds = OVR_predict(X_test, w=w, b=b)
-        print('train acc: %f, test acc: %f' % 
-            (accuracy_score(y_train, train_preds),
-             accuracy_score(y_test, preds)))
+        # print('One-versus-rest:')
+        # w, b = OVR_train(X_train, y_train, C=num_classes)
+        # train_preds = OVR_predict(X_train, w=w, b=b)
+        # preds = OVR_predict(X_test, w=w, b=b)
+        # print('train acc: %f, test acc: %f' % 
+        #     (accuracy_score(y_train, train_preds),
+        #      accuracy_score(y_test, preds)))
     
         print('Multinomial:')
         w, b = multinomial_train(X_train, y_train, C=num_classes)
