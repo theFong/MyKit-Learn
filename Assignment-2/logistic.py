@@ -43,7 +43,7 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
         b = b0
     
     w = np.append(w, b)
-    X = np.append([[1]]*len(X),X, axis=1)
+    X = np.append(X, [[1]]*len(X), axis=1)
     D += 1
 
     """
@@ -71,7 +71,7 @@ def binary_predict(X, w, b):
     Returns:
     - preds: N dimensional vector of binary predictions: {0, 1}
     """
-    X = np.append([[1]]*len(X),X, axis=1)
+    X = np.append(X, [[1]]*len(X), axis=1)
     N, D = X.shape
     preds = np.zeros(N) 
     w = np.array(w)
@@ -126,7 +126,7 @@ def multinomial_train(X, y, C,
         b = b0
 
     w = np.append(w, [[b_] for b_ in b], axis=1)
-    X = np.append([[1]]*len(X),X, axis=1)
+    X = np.append(X, [[1]]*len(X), axis=1)
     D += 1
 
     """
@@ -172,7 +172,7 @@ def multinomial_predict(X, w, b):
 
     Make predictions for multinomial classifier.
     """
-    X = np.append([[1]]*len(X),X, axis=1)
+    X = np.append(X, [[1]]*len(X), axis=1)
     N, D = X.shape
     C = w.shape[0]
     preds = np.zeros(N) 
@@ -222,16 +222,16 @@ def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=150):
     create train C logistic classifiers
     1 vs the rest
     """
-    w = np.array([ train_bin_clasifier(X, y, i, step_size, max_iterations) for i in range(0, C) ])
+    w = np.array([ train_bin_clasifier(X, y, w0, b0, i, step_size, max_iterations) for i in range(0, C) ])
 
     D += 1
     assert w.shape == (C, D), 'wrong shape of weights matrix'
     assert b.shape == (C,), 'wrong shape of bias terms vector'
     return w, b
 
-def train_bin_clasifier(X, y, k, step_size, max_iterations):
+def train_bin_clasifier(X, y, w, b, k, step_size, max_iterations):
     y = [ 1 if Yn == k else 0 for Yn in y ]
-    return binary_train(X, y, step_size=step_size, max_iterations=max_iterations)[0]
+    return binary_train(X, y, w, b, step_size=step_size, max_iterations=max_iterations)[0]
 
 def OVR_predict(X, w, b):
     """
@@ -252,7 +252,7 @@ def OVR_predict(X, w, b):
     N, D = X.shape
     C = w.shape[0]
     preds = np.zeros(N) 
-    X = np.append([[1]]*len(X),X, axis=1)
+    X = np.append(X, [[1]]*len(X), axis=1)
     """
     1 or the rest
     create K predictions and return max class

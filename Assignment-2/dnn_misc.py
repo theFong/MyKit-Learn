@@ -37,6 +37,7 @@ class linear_layer:
         self.params = dict()
         self.params['W'] = np.random.normal(0, 0.1, (input_D, output_D))
         self.params['b'] = np.random.normal(0, 0.1, (1, output_D))
+        self.params['dims'] = (input_D, output_D)
 
         self.gradient = dict()
         self.gradient['W'] = np.zeros((input_D, output_D))
@@ -62,8 +63,14 @@ class linear_layer:
         """
 
         ################################################################################
-        # TODO: Implement the linear forward pass. Store the result in forward_output  #
+        # u = W(1)x + b(1)
         ################################################################################
+        # augment weights with bias
+        W = np.append(self.params['W'], [[b_] for b_ in self.params['b']], axis=1)
+        X = np.append(X, [[1]]*len(X), axis=1)
+
+        # in_D, out_D X N, ind_D
+        forward_output = np.inner(W.T,X).T
 
         return forward_output
 
@@ -97,6 +104,7 @@ class linear_layer:
         # backward_output = ? (N-by-input_D numpy array, the gradient of the mini-batch loss w.r.t. X)                           #
         # only return backward_output, but need to compute self.gradient['W'] and self.gradient['b']                             #
         ##########################################################################################################################
+
 
         return backward_output
 
