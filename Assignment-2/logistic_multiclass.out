@@ -1,9 +1,9 @@
 Synthetic data: 3 class classification
 Multinomial:
-train acc: 0.622857, test acc: 0.526667
+train acc: 0.902857, test acc: 0.840000
 Synthetic data: 5 class classification
 Multinomial:
-train acc: 0.388571, test acc: 0.426667
+train acc: 0.894286, test acc: 0.906667
 MNIST: 10 class classification
 Multinomial:
-train acc: 0.793000, test acc: 0.774000
+train acc: 0.945400, test acc: 0.896000

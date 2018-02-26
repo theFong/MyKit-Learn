@@ -30,9 +30,9 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     Use the average of the gradients for all training examples to
     update parameters.
     """
+    
     N, D = X.shape
     assert len(np.unique(y)) == 2
-
 
     w = np.zeros(D)
     if w0 is not None:
@@ -41,7 +41,10 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     b = 0
     if b0 is not None:
         b = b0
-
+    
+    w = np.append(w, b)
+    X = np.append([[1]]*len(X),X, axis=1)
+    D += 1
 
     """
     Stochastic gradient descent:
@@ -49,12 +52,12 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     """
 
     for it in range(0,max_iterations):
-        i = it % N
-        # calc h(x)
-        hx = sigmoid(w.T.dot(X[i]))
+        # calculate gradient
+        g = np.mean([ ((sigmoid(w.T.dot(Xn)) - Yn) * Xn) for Xn, Yn in zip(X,y) ], axis=0)
         # update rule
-        w = w - step_size * (hx - y[i]) * (X[i])
+        w -= step_size * g
 
+    b = w[D-1]
     assert w.shape == (D,)
     return w, b
 
@@ -68,10 +71,11 @@ def binary_predict(X, w, b):
     Returns:
     - preds: N dimensional vector of binary predictions: {0, 1}
     """
+    X = np.append([[1]]*len(X),X, axis=1)
     N, D = X.shape
     preds = np.zeros(N) 
     w = np.array(w)
-
+    
 
     """
     h(x) = sigmoid(W^tX)
@@ -111,7 +115,6 @@ def multinomial_train(X, y, C,
     each label y_i is represented as a row of zeros with a single 1 in
     the column, that corresponds to the class y_i belongs to. 
     """
-
     N, D = X.shape
 
     w = np.zeros((C, D))
@@ -122,6 +125,9 @@ def multinomial_train(X, y, C,
     if b0 is not None:
         b = b0
 
+    w = np.append(w, [[b_] for b_ in b], axis=1)
+    X = np.append([[1]]*len(X),X, axis=1)
+    D += 1
 
     """
     stochastic gradient descent:
@@ -133,18 +139,22 @@ def multinomial_train(X, y, C,
     y = np.array([[1 if Yn == k else 0 for k in range(0,C)] for Yn in y])
     # sgd
     for it in range(0,max_iterations):
-        n = it % D
         # calculate the gradients
-        G = np.array([ (prob_of_class(w,wk,X[n]) - yk) * (X[n]) for yk, wk in zip(y[n],w) ])
+        g = np.mean([ calc_gradient(w, Xn, Yn) for Xn, Yn in zip(X,y) ], axis=0)
         # update rule
-        w = w - step_size * G
+        w -= step_size * g
+        # update 
 
+    b = w[:,D-1]
     assert w.shape == (C, D)
     assert b.shape == (C,)
     return w, b
 
-def prob_of_class(W,Wk,Xn):
-    return ( np.exp(Wk.T.dot(Xn)) / np.sum([ np.exp(Wl.T.dot(Xn)) for Wl in W ]) )
+def calc_gradient(w, Xn, Yn):
+    return np.array([ (softmax(w,wk,Xn) - yk) * (Xn) for yk, wk in zip(Yn,w) ])
+
+def softmax(W,Wk,Xn, wtx_max=0):
+    return ( np.exp(Wk.T.dot(Xn) - wtx_max) / np.sum([ np.exp(Wl.T.dot(Xn) - wtx_max) for Wl in W ]) )
 
 
 def multinomial_predict(X, w, b):
@@ -162,6 +172,7 @@ def multinomial_predict(X, w, b):
 
     Make predictions for multinomial classifier.
     """
+    X = np.append([[1]]*len(X),X, axis=1)
     N, D = X.shape
     C = w.shape[0]
     preds = np.zeros(N) 
@@ -170,14 +181,14 @@ def multinomial_predict(X, w, b):
     argmax(W^tx)
     """
 
-    softmax = np.inner(w,(X)).T
-    preds = np.array([ p.tolist().index(max(p)) for p in softmax ])
+    softmax = np.inner(w,(X))
+    preds = np.argmax(softmax,axis = 0)
 
     assert preds.shape == (N,)
     return preds
 
 
-def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=1000):
+def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=150):
     """
     Inputs:
     - X: training features, a N-by-D numpy array, where N is the 
@@ -199,7 +210,6 @@ def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     trained by training C different classifiers. 
     """
     N, D = X.shape
-    
     w = np.zeros((C, D))
     if w0 is not None:
         w = w0
@@ -209,12 +219,19 @@ def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=1000):
         b = b0
 
     """
-    TODO: add your code here
+    create train C logistic classifiers
+    1 vs the rest
     """
+    w = np.array([ train_bin_clasifier(X, y, i, step_size, max_iterations) for i in range(0, C) ])
+
+    D += 1
     assert w.shape == (C, D), 'wrong shape of weights matrix'
     assert b.shape == (C,), 'wrong shape of bias terms vector'
     return w, b
 
+def train_bin_clasifier(X, y, k, step_size, max_iterations):
+    y = [ 1 if Yn == k else 0 for Yn in y ]
+    return binary_train(X, y, step_size=step_size, max_iterations=max_iterations)[0]
 
 def OVR_predict(X, w, b):
     """
@@ -235,10 +252,13 @@ def OVR_predict(X, w, b):
     N, D = X.shape
     C = w.shape[0]
     preds = np.zeros(N) 
-    
+    X = np.append([[1]]*len(X),X, axis=1)
     """
-    TODO: add your code here
+    1 or the rest
+    create K predictions and return max class
     """
+    preds = [ sigmoid(np.inner(Wk.T,(X))) for Wk in w ]
+    preds = np.argmax(preds, axis=0)
 
     assert preds.shape == (N,)
     return preds
@@ -301,13 +321,13 @@ def run_multiclass():
         print('%s: %d class classification' % (name, num_classes))
         X_train, X_test, y_train, y_test = data
         
-        # print('One-versus-rest:')
-        # w, b = OVR_train(X_train, y_train, C=num_classes)
-        # train_preds = OVR_predict(X_train, w=w, b=b)
-        # preds = OVR_predict(X_test, w=w, b=b)
-        # print('train acc: %f, test acc: %f' % 
-        #     (accuracy_score(y_train, train_preds),
-        #      accuracy_score(y_test, preds)))
+        print('One-versus-rest:')
+        w, b = OVR_train(X_train, y_train, C=num_classes)
+        train_preds = OVR_predict(X_train, w=w, b=b)
+        preds = OVR_predict(X_test, w=w, b=b)
+        print('train acc: %f, test acc: %f' % 
+            (accuracy_score(y_train, train_preds),
+             accuracy_score(y_test, preds)))
     
         print('Multinomial:')
         w, b = multinomial_train(X_train, y_train, C=num_classes)
