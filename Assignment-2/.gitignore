@@ -3,3 +3,4 @@ Assignment-2env
 test.py
 __pycache__
 .vscode
+*.pyc

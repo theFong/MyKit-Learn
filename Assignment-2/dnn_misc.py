@@ -157,10 +157,10 @@ class relu:
 
         ################################################################################
         ################################################################################
-        forward_output = X * (X > 0)
+        np.maximum(X,0,X)
         self.mask = np.heaviside(X,0)
 
-        return forward_output
+        return X
 
     def backward(self, X, grad):
 

@@ -6,10 +6,13 @@ import scipy as sp
 from matplotlib import pyplot as plt
 from matplotlib import cm
 
+# supress sklearn warnings
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 
-#######################################################################
-# DO NOT MODIFY THE CODE BELOW 
-#######################################################################
+from tqdm import tqdm
 
 def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     """
@@ -51,7 +54,7 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     w  <- w - step_size * (sigmoid(W^tXn) - Yn) * Xn
     """
 
-    for it in range(0,max_iterations):
+    for it in tqdm(range(0,max_iterations), ncols=100):
         # calculate gradient
         g = np.mean([ ((sigmoid(w.T.dot(Xn)) - Yn) * Xn) for Xn, Yn in zip(X,y) ], axis=0)
         # update rule
@@ -138,7 +141,7 @@ def multinomial_train(X, y, C,
     # 1 of k encoding
     y = np.array([[1 if Yn == k else 0 for k in range(0,C)] for Yn in y])
     # sgd
-    for it in range(0,max_iterations):
+    for it in tqdm(range(0,max_iterations), ncols= 100):
         # calculate the gradients
         g = np.mean([ calc_gradient(w, Xn, Yn) for Xn, Yn in zip(X,y) ], axis=0)
         # update rule
