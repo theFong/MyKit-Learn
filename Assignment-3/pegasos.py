@@ -17,8 +17,7 @@ def objective_function(X, y, w, lamb):
     """
     # ( lamb / 2 |W|l2^2  + 1 / n * sum n(max(0,1 - Yn * W^T Xn)))
     obj_value = lamb / 2 * la.norm(w)**2 + np.mean([max(0, 1 - Yn * np.matmul(w.T, Xn.reshape(Xn.shape[0],1))) for Xn, Yn in zip(X,y)])
-    print('objective_func',w.shape)
-    return obj_value
+    return obj_value.tolist()
 
 
 ###### Q1.2 ######
@@ -43,18 +42,39 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
     D = Xtrain.shape[1]
 
     train_obj = []
-    print('train',w.shape)
 
     for iter in range(1, max_iterations + 1):
         # randomly create k rand nums scale by N floor of values and cast as int
         A_t = np.floor(np.random.rand(k) * N).astype(int)  # indexes of the current mini-batch
+
+        A_t_pos = []
+        for i in A_t:
+            if ytrain[i] * np.inner(w.transpose(),Xtrain[i]) < 1:
+                A_t_pos.append(i)
+
         learn_rate = 1 / (lamb * iter)
 
-        w = (1 - learn_rate * lamb) * w + (learn_rate / k) * np.sum( [Xtrain[i] * ytrain[i] for i in A_t] )
-        w = min(1.0, (1 / (lamb ** .5) ) / la.norm(w) ) * w
+        some_sum = [0] * D
+        for d in A_t_pos:
+            some_sum += Xtrain[i] * ytrain[i]
+        some_sum = [[i] for i in some_sum]
+
+        w = (1 - learn_rate * lamb) * w + np.multiply((learn_rate / k), some_sum)
+        w = np.multiply( min( 1.0, (1 / (lamb ** .5) ) / la.norm(w) ), w)
+
         train_obj.append(objective_function(Xtrain, ytrain, w, lamb))
 
-    print(w.shape)
+
+    # lh = (1 - n_t * lamb) * w 
+    #     rh = np.multiply((n_t / k), b_sum)
+    #     w_ = lh + rh
+    #     z = ((1 / np.sqrt(lamb)) / np.linalg.norm(w_))
+    #     if(z < 1):
+    #         w = np.multiply(z, w_)
+    #     else:
+    #         w = w_
+    #     train_obj.append(objective_function(Xtrain, ytrain, w, lamb))
+
     return w, train_obj
 
 
@@ -76,22 +96,19 @@ def pegasos_test(Xtest, ytest, w, t = 0.):
     N = Xtest.shape[0]
 
     preds = np.inner(w.transpose(),Xtest)
-    print(preds.shape)
-    preds = [1 if n > t else -1 for n in preds]
+
+    preds = [1 if n > t else -1 for n in preds[0]]
     
-    test_acc = 0
+    correct_count = 0
+
     for p, y in zip(preds, ytest):
         if p == y:
-            test_acc += 1
-    test_acc / N
+            correct_count += 1
+    test_acc = correct_count / N
 
     return test_acc
 
 
-"""
-NO MODIFICATIONS below this line.
-You should only write your code in the above functions.
-"""
 
 def data_loader_mnist(dataset):
 
