@@ -70,26 +70,68 @@ class TreeNode(object):
 					  B is the number of branches
 					  it stores the number of 
 			'''
-			########################################################
-			# TODO: compute the conditional entropy
-			########################################################
-			
+			C = len(branches)
+			B = len(branches[0])
+			total = np.sum(branches)
+			weighted_entropy = 0.
+
+			for b in range(0,B):
+				sum_branch = np.sum([branch[b] for branch in branches])
+				running_entropy = 0.
+				for c in range(0,C):
+					total_c = branches[c][b]
+					if total_c != 0:
+						running_entropy += (total_c / sum_branch) * np.log((total_c / sum_branch))
+				weighted_entropy += (sum_branch / total) * -running_entropy
+
+			return weighted_entropy
+
+		if len(self.features[0]) == 0:
+			self.splittable = False
+			return
 		
-		for idx_dim in range(len(features[0])):
+		# ############################################################
+		# #  compare each split using conditional entropy
+		# #       find the best split
+		# ############################################################
+		cond_entropies = []
+
+		for idx_dim in range(len(self.features[0])):
+			feature_n = np.unique([feature[idx_dim] for feature in self.features])
+
+			feature_to_index = {}
+			for f, i in zip(feature_n, range(0,len(feature_n))):
+				feature_to_index[f] = i
+
+			branches = np.zeros((self.num_cls, len(feature_n)))
+			labels_n = np.unique(self.labels).tolist()
+			for f, l in zip(self.features, self.labels):
+				l_i = labels_n.index(l)
+				branches[l_i][feature_to_index[f[idx_dim]]] += 1
+
+			c_entropy_n = conditional_entropy(branches)
+			cond_entropies.append(c_entropy_n)
+		max_entropy_feature_ind = np.argmax(cond_entropies)
+		
 		############################################################
-		# TODO: compare each split using conditional entropy
-		#       find the 
+		# split the node, add child nodes
 		############################################################
+		self.dim_split = max_entropy_feature_ind
+		features_dim = [ feature[max_entropy_feature_ind] for feature in self.features]
+		feature_dim_to_split = np.unique(features_dim)
+		self.feature_uniq_split = feature_dim_to_split.tolist()
+		for f_s in feature_dim_to_split:
+			node_features = []
+			node_labels = []
 
+			for f, l in zip(self.features, self.labels):
+				if(f[max_entropy_feature_ind] == f_s):
+					node_features.append(f)
+					node_labels.append(l)
 
-
-
-		############################################################
-		# TODO: split the node, add child nodes
-		############################################################
-
-
-
+			node_features = np.delete(node_features, max_entropy_feature_ind, 1).tolist()
+			node = TreeNode(node_features, node_labels, len(np.unique(node_labels)))
+			self.children.append(node)
 
 		# split the child nodes
 		for child in self.children:

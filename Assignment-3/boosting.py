@@ -103,7 +103,7 @@ class LogitBoost(Boosting):
 						min_classifier = clf
 
 			self.clfs_picked.append(min_classifier)
-			self.betas.append(1 / 2)
+			self.betas.append(1. / 2)
 
 			preds = self.predict(features)
 			pis = [ 1 / (1 + np.exp(-2 * p)) for xn, p in zip(features, preds)]
