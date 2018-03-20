@@ -2,7 +2,8 @@ import json
 import numpy as np
 from numpy import linalg as la
 
-
+# [1] Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro, Andrew Cotter Mathematical Programming, 2011,
+# Volume 127, Number 1, Page 3. Pegasos: primal estimated sub-gradient solver for SVM.
 ###### Q1.1 ######
 def objective_function(X, y, w, lamb):
     """
@@ -54,12 +55,12 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
 
         learn_rate = 1 / (lamb * it)
 
-        some_sum = [0] * D
+        yx_sum = [0] * D
         for i in A_t_p:
-            some_sum += Xtrain[i] * ytrain[i]
-        some_sum = [[i] for i in some_sum]
+            yx_sum += Xtrain[i] * ytrain[i]
+        yx_sum = [[i] for i in yx_sum]
 
-        w = (1 - learn_rate * lamb) * w + np.multiply((learn_rate / k), some_sum)
+        w = (1 - learn_rate * lamb) * w + np.multiply((learn_rate / k), yx_sum)
         w =  min( 1.0, (1 / (lamb ** .5) ) / la.norm(w) ) * w
 
         train_obj.append(objective_function(Xtrain, ytrain, w, lamb))
