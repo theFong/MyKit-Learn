@@ -43,37 +43,26 @@ def pegasos_train(Xtrain, ytrain, w, lamb, k, max_iterations):
 
     train_obj = []
 
-    for iter in range(1, max_iterations + 1):
+    for it in range(1, max_iterations + 1):
         # randomly create k rand nums scale by N floor of values and cast as int
         A_t = np.floor(np.random.rand(k) * N).astype(int)  # indexes of the current mini-batch
 
-        A_t_pos = []
+        A_t_p = []
         for i in A_t:
             if ytrain[i] * np.inner(w.transpose(),Xtrain[i]) < 1:
-                A_t_pos.append(i)
+                A_t_p.append(i)
 
-        learn_rate = 1 / (lamb * iter)
+        learn_rate = 1 / (lamb * it)
 
         some_sum = [0] * D
-        for d in A_t_pos:
+        for i in A_t_p:
             some_sum += Xtrain[i] * ytrain[i]
         some_sum = [[i] for i in some_sum]
 
         w = (1 - learn_rate * lamb) * w + np.multiply((learn_rate / k), some_sum)
-        w = np.multiply( min( 1.0, (1 / (lamb ** .5) ) / la.norm(w) ), w)
+        w =  min( 1.0, (1 / (lamb ** .5) ) / la.norm(w) ) * w
 
         train_obj.append(objective_function(Xtrain, ytrain, w, lamb))
-
-
-    # lh = (1 - n_t * lamb) * w 
-    #     rh = np.multiply((n_t / k), b_sum)
-    #     w_ = lh + rh
-    #     z = ((1 / np.sqrt(lamb)) / np.linalg.norm(w_))
-    #     if(z < 1):
-    #         w = np.multiply(z, w_)
-    #     else:
-    #         w = w_
-    #     train_obj.append(objective_function(Xtrain, ytrain, w, lamb))
 
     return w, train_obj
 
