@@ -121,7 +121,7 @@ class TreeNode(object):
 			node_labels = []
 
 			for f, l in zip(self.features, self.labels):
-				if(f[max_entropy_feature_ind] == f_s):
+				if f[max_entropy_feature_ind] == f_s:
 					node_features.append(f)
 					node_labels.append(l)
 
