@@ -90,10 +90,8 @@ class TreeNode(object):
 			self.splittable = False
 			return
 		
-		# ############################################################
 		# #  compare each split using conditional entropy
 		# #       find the best split
-		# ############################################################
 		cond_entropies = []
 
 		for idx_dim in range(len(self.features[0])):
@@ -113,9 +111,7 @@ class TreeNode(object):
 			cond_entropies.append(c_entropy_n)
 		max_entropy_feature_ind = np.argmax(cond_entropies)
 		
-		############################################################
 		# split the node, add child nodes
-		############################################################
 		self.dim_split = max_entropy_feature_ind
 		features_dim = [ feature[max_entropy_feature_ind] for feature in self.features]
 		feature_dim_to_split = np.unique(features_dim)
