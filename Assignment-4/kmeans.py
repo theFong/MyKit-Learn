@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.linalg as la
 
 
 class KMeans():
@@ -37,10 +38,17 @@ class KMeans():
         # - return (means, membership, number_of_updates)
 
         # DONOT CHANGE CODE ABOVE THIS LINE
-        raise Exception(
-            'Implement fit function in KMeans class (filename: kmeans.py')
+        # initialize to k random points
+        self.n_cluster = x[np.random.randint(A.shape[0], size=len(self.n_cluster)), :]
+        # for each cluster
+        for u in self.n_cluster:
+            mean = np.mean([  ])
         # DONOT CHANGE CODE BELOW THIS LINE
-
+    def indicator(self, x):
+        indicator_mat = np.zeros(x.shape)
+        for i,xn in enumerate(x):
+            centroid = np.argmin([la.norm(xn - u) for u in self.n_cluster])
+            indicator_mat[i][centroid] = 1
 
 class KMeansClassifier():
 

@@ -67,6 +67,7 @@ def main(main_params):
     ### data processing ###
     Xtrain, Ytrain, Xval, Yval , _, _ = data_loader_mnist(dataset = 'mnist_subset.json')
     N_train, d, _, _ = Xtrain.shape
+    print(d)
     N_val, _, _, _ = Xval.shape
 
     trainSet = DataSplit(Xtrain, Ytrain)

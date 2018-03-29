@@ -356,7 +356,7 @@ class flatten_layer:
     def forward(self, X):
         self.size = X.shape
         out_forward = X.reshape(X.shape[0], -1)
-
+        # print(X.shape)
         return out_forward
 
     def backward(self, X, grad):
