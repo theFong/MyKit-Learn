@@ -39,16 +39,47 @@ class KMeans():
 
         # DONOT CHANGE CODE ABOVE THIS LINE
         # initialize to k random points
-        self.n_cluster = x[np.random.randint(A.shape[0], size=len(self.n_cluster)), :]
-        # for each cluster
-        for u in self.n_cluster:
-            mean = np.mean([  ])
+        self.k_means = x[np.random.randint(x.shape[0], size=self.n_cluster), :]
+        # for each cluster, recalc cluster mean
+        # distortion
+        j = 0
+        indicators = None
+        update_count = self.max_iter
+        for iter in range(self.max_iter):
+            indicators = self.indicator(x)
+            j_new = 0
+            for cluster_num in range(len(self.k_means)):
+                # calculate nearest points to each mean and calc new mean
+                points_in_cluster = []
+                for xn, indn in zip(x,indicators):
+                    # get indicator index use argmax because storing euclidean distance to mean instead of 0,1
+                    indicator_index = np.argmax(indn)
+                    if indicator_index == cluster_num:
+                        points_in_cluster.append(xn)
+                        euclidean_distance = max(indn)
+                        # calculating distortion measure
+                        j_new += euclidean_distance / len(x)
+
+                self.k_means[cluster_num] = np.mean(points_in_cluster, axis=0)
+                
+            if(np.abs(j_new - j) <= self.e):
+                update_count = iter
+                break
+            j = j_new
+            
+            
+        membership = np.array([ np.argmax(i) for i in indicators])
+        return self.k_means, membership, update_count
+            
         # DONOT CHANGE CODE BELOW THIS LINE
     def indicator(self, x):
-        indicator_mat = np.zeros(x.shape)
-        for i,xn in enumerate(x):
-            centroid = np.argmin([la.norm(xn - u) for u in self.n_cluster])
-            indicator_mat[i][centroid] = 1
+        indicator_mat = np.zeros((x.shape[0],self.k_means.shape[0]))
+        for i,xn in enumerate(x, start=0):
+            euclidean_distances = [ la.norm(xn - u) for u in self.k_means ]
+            centroid = np.argmin(euclidean_distances)
+            distance = min(euclidean_distances)
+            indicator_mat[i][centroid] = distance
+        return indicator_mat
 
 class KMeansClassifier():
 

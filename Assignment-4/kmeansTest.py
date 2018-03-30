@@ -162,5 +162,5 @@ def kmeans_classification():
 
 if __name__ == '__main__':
     kmeans_toy()
-    kmeans_image_compression()
-    kmeans_classification()
+    # kmeans_image_compression()
+    # kmeans_classification()
