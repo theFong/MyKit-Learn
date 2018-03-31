@@ -31,8 +31,6 @@ class KMeans():
         np.random.seed(42)
         N, D = x.shape
 
-        # TODO:
-        # - comment/remove the exception.
         # - Initialize means by picking self.n_cluster from N data points
         # - Update means and membership untill convergence or untill you have made self.max_iter updates.
         # - return (means, membership, number_of_updates)
@@ -45,6 +43,7 @@ class KMeans():
         j = 0
         indicators = None
         update_count = self.max_iter
+
         for iter in range(self.max_iter):
             indicators = self.indicator(x)
             j_new = 0
@@ -53,10 +52,9 @@ class KMeans():
                 points_in_cluster = []
                 for xn, indn in zip(x,indicators):
                     # get indicator index use argmax because storing euclidean distance to mean instead of 0,1
-                    indicator_index = np.argmax(indn)
-                    if indicator_index == cluster_num:
+                    if indn[0] == cluster_num:
                         points_in_cluster.append(xn)
-                        euclidean_distance = max(indn)
+                        euclidean_distance = indn[1]
                         # calculating distortion measure
                         j_new += euclidean_distance / len(x)
 
@@ -67,18 +65,17 @@ class KMeans():
                 break
             j = j_new
             
-            
-        membership = np.array([ np.argmax(i) for i in indicators])
+        membership = np.array([ i[0] for i in indicators ])
         return self.k_means, membership, update_count
             
         # DONOT CHANGE CODE BELOW THIS LINE
     def indicator(self, x):
-        indicator_mat = np.zeros((x.shape[0],self.k_means.shape[0]))
+        indicator_mat = []
         for i,xn in enumerate(x, start=0):
-            euclidean_distances = [ la.norm(xn - u) for u in self.k_means ]
+            euclidean_distances = [ la.norm(xn - u) for u in self.k_means ]          
             centroid = np.argmin(euclidean_distances)
             distance = min(euclidean_distances)
-            indicator_mat[i][centroid] = distance
+            indicator_mat.append((centroid,distance))
         return indicator_mat
 
 class KMeansClassifier():
@@ -116,17 +113,17 @@ class KMeansClassifier():
 
         np.random.seed(42)
         N, D = x.shape
-        # TODO:
-        # - comment/remove the exception.
-        # - Implement the classifier
+
         # - assign means to centroids
         # - assign labels to centroid_labels
 
-        # DONOT CHANGE CODE ABOVE THIS LINE
-        raise Exception(
-            'Implement fit function in KMeansClassifier class (filename: kmeans.py')
+        k_means = KMeans(self.n_cluster, max_iter=self.max_iter, e=self.e)
+        centroids, memberships, _ = k_means.fit(x)
+        centroid_quorem = np.zeros((self.n_cluster, self.n_cluster))
+        for yn, m in zip(y, memberships):
+            centroid_quorem[m][yn] += 1
 
-        # DONOT CHANGE CODE BELOW THIS LINE
+        centroid_labels = np.array([ np.argmax(c) for c in centroid_quorem ])
 
         self.centroid_labels = centroid_labels
         self.centroids = centroids
@@ -151,12 +148,10 @@ class KMeansClassifier():
 
         np.random.seed(42)
         N, D = x.shape
-        # TODO:
-        # - comment/remove the exception.
-        # - Implement the prediction algorithm
-        # - return labels
 
-        # DONOT CHANGE CODE ABOVE THIS LINE
-        raise Exception(
-            'Implement predict function in KMeansClassifier class (filename: kmeans.py')
-        # DONOT CHANGE CODE BELOW THIS LINE
+        return np.array([ self.centroid_labels[self.calc_nearest_centroid(xn)] for xn in x ])
+
+    def calc_nearest_centroid(self, xn):
+        euclidean_distances = [ la.norm(self.centroids - u) for u in self.centroids ]
+        centroid = np.argmin(euclidean_distances)
+        return centroid

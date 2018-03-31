@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.linalg as la
 from data_loader import toy_dataset, load_digits
 from kmeans import KMeans, KMeansClassifier
 from sklearn.linear_model import LogisticRegression
@@ -31,9 +32,19 @@ def transform_image(image, code_vectors):
     # - implement the function
 
     # DONOT CHANGE CODE ABOVE THIS LINE
-    raise Exception(
-        'Implement transform_image function (filename:kmeansTest.py')
+    compressed_image = image
+    for i in range(compressed_image.shape[0]):
+        for j in range(compressed_image.shape[1]):
+            nearest_centroid = calc_nearest_centroid(compressed_image[i][j], code_vectors)
+            compressed_image[i][j] = nearest_centroid
+
+    return compressed_image
     # DONOT CHANGE CODE BELOW THIS LINE
+
+def calc_nearest_centroid(pixel, code_vectors):
+    euclidean_distances = [ la.norm(pixel - u) for u in code_vectors ]
+    centroid = np.argmin(euclidean_distances)
+    return centroid
 
 
 ################################################################################
@@ -161,6 +172,6 @@ def kmeans_classification():
 
 
 if __name__ == '__main__':
-    kmeans_toy()
+    # kmeans_toy()
     # kmeans_image_compression()
-    # kmeans_classification()
+    kmeans_classification()
