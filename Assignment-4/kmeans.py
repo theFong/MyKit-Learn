@@ -66,7 +66,7 @@ class KMeans():
             j = j_new
             
         membership = np.array([ i[0] for i in indicators ])
-        return self.k_means, membership, update_count
+        return self.k_means, membership, update_count+1
             
         # DONOT CHANGE CODE BELOW THIS LINE
     def indicator(self, x):

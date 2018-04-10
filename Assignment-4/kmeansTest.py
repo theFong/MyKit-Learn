@@ -27,24 +27,17 @@ def transform_image(image, code_vectors):
     assert code_vectors.shape[1] == 3 and len(code_vectors.shape) == 2, \
         'code_vectors should be a 2-D array with size (?,3)'
 
-    # TODO
-    # - comment/remove the exception
-    # - implement the function
-
-    # DONOT CHANGE CODE ABOVE THIS LINE
     compressed_image = image
     for i in range(compressed_image.shape[0]):
         for j in range(compressed_image.shape[1]):
-            nearest_centroid = calc_nearest_centroid(compressed_image[i][j], code_vectors)
-            compressed_image[i][j] = nearest_centroid
+            compressed_image[i][j] = calc_nearest_centroid(compressed_image[i][j], code_vectors)
 
     return compressed_image
-    # DONOT CHANGE CODE BELOW THIS LINE
 
 def calc_nearest_centroid(pixel, code_vectors):
-    euclidean_distances = [ la.norm(pixel - u) for u in code_vectors ]
-    centroid = np.argmin(euclidean_distances)
-    return centroid
+    euclidean_distances = [ la.norm(pixel - u, 2) for u in code_vectors ]
+    centroid_ind = np.argmin(euclidean_distances)
+    return code_vectors[centroid_ind]
 
 
 ################################################################################
@@ -172,6 +165,6 @@ def kmeans_classification():
 
 
 if __name__ == '__main__':
-    # kmeans_toy()
-    # kmeans_image_compression()
+    kmeans_toy()
+    kmeans_image_compression()
     kmeans_classification()
