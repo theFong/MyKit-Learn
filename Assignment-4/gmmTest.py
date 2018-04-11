@@ -9,7 +9,6 @@ def compute_elipse_params(variance):
     '''
         Compute elipse params for plotting from variance
     '''
-
     # http://www.cs.cornell.edu/cv/OtherPdf/Ellipse.pdf Slide 17
     # https://stackoverflow.com/a/41821484
 

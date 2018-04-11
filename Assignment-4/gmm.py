@@ -1,7 +1,10 @@
 import numpy as np
 import numpy.linalg as la
+from numpy import ma
 from kmeans import KMeans
 import sys
+np.seterr(divide='ignore', invalid='ignore')
+
 
 
 class GMM():
@@ -49,7 +52,7 @@ class GMM():
             # - compute variance and pi_k
             km = KMeans(self.n_cluster, max_iter=self.max_iter, e=self.e)
             self.means, memberships, _  = km.fit(x)
-            
+
             quorem = np.bincount(memberships)
             self.variances = np.zeros((self.n_cluster, D, D))
             self.pi_k = np.zeros((self.n_cluster))
@@ -78,25 +81,28 @@ class GMM():
         l = 0
         for iter in range(self.max_iter):
             # E step
-            gammas = np.zeros((N,self.n_cluster))
+            gammas_num = np.zeros((N,self.n_cluster))
             for i,xi in enumerate(x):
                 for k in range(self.n_cluster):
-                    gammas[i][k] = self.pi_k[k] * self.multi_gaussian(xi,self.means[k], self.variances[k])
-            likelihood = np.sum(gammas, axis=1).reshape(N, 1)
-            l_new = np.sum(gammas.T @ np.log(likelihood), axis= 0)[0]
-            self.gammas = gammas / likelihood
+                    gammas_num[i][k] = self.pi_k[k] * self.multi_gaussian(xi,self.means[k], self.variances[k])
+            
+            gammas_den = np.sum(gammas_num, axis=1).reshape(N, 1)
+            likelihood = np.sum(ma.log(gammas_num).data, axis=1).reshape(N, 1)
+            # l_new = np.sum(gammas.T @ np.log(likelihood), axis= 0)[0]
+            l_new = np.sum(likelihood, axis= 0)[0]
+            self.gammas = gammas_num / gammas_den
 
             # M step
-            n_k = np.sum(gammas, axis=0).reshape(self.n_cluster,1)
+            n_k = np.sum(self.gammas, axis=0).reshape(self.n_cluster,1)
             self.pi_k = n_k / N
-            self.means = (gammas.T @ x) / n_k
+            
+            self.means = (self.gammas.T @ x) / n_k
 
             self.variances = np.zeros((self.n_cluster, D, D))
             for k in range(self.n_cluster):
-                diff = np.sqrt(gammas[:,k].reshape(N, 1)) * (x - self.means[k])
+                diff = np.sqrt(self.gammas[:,k].reshape(N, 1)) * (x - self.means[k])
                 self.variances[k] =  (diff.T @ diff) / n_k[k]
             
-            # print(l_new)
             if np.abs(l - l_new) <= self.e:
                 update_count = iter
                 break
@@ -111,8 +117,17 @@ class GMM():
     def multi_gaussian(self, xi, uk, vark):
         while la.cond(vark) > 1 / sys.float_info.epsilon:
             vark += .001 * np.identity(vark.shape[0])
+        while np.linalg.matrix_rank(vark) != vark.shape[0]:
+            vark += .001 * np.identity(vark.shape)
         pdf = (1 / np.sqrt( np.power(2*np.pi, xi.shape[0]) * la.det(vark)) ) * np.exp( -(1 / 2) * ((xi - uk).T @ la.inv(vark) @ (xi - uk)) )
         return pdf
+
+    # while np.linalg.matrix_rank(self.variances[k]) != self.variances[k].shape[0]:
+    #         self.variances[k] += 1e-3 * np.identity(self.variances.shape)
+
+    #     l = 1 / np.sqrt(((2 * np.pi) ** len(x)) * np.linalg.det(self.variances[k]))
+    #     r = np.exp((-0.5) * (x - self.means[k]) @ np.linalg.inv(self.variances[k]) @ (x - self.means[k]).T)
+    #     return l * r
 
     def sample(self, N):
         '''
@@ -127,14 +142,13 @@ class GMM():
         if (self.means is None):
             raise Exception('Train GMM before sampling')
 
-        # TODO
-        # - comment/remove the exception
         # - generate samples from the GMM
         # - return the samples
-
-        # DONOT MODIFY CODE ABOVE THIS LINE
-        raise Exception('Implement sample function in gmm.py')
-        # DONOT MODIFY CODE BELOW THIS LINE
+        s = []
+        for n in range(N):
+            k = np.random.randint(self.n_cluster)
+            s.append(np.random.multivariate_normal(self.means[k], self.variances[k]))
+        return np.array(s)
 
     def compute_log_likelihood(self, x):
         '''
@@ -150,10 +164,7 @@ class GMM():
         for i,xi in enumerate(x):
             for k in range(self.n_cluster):
                 gammas[i][k] = self.pi_k[k] * self.multi_gaussian(xi,self.means[k], self.variances[k])
-        likelihood = np.sum(gammas, axis=1).reshape(len(x), 1)
-        gammas = gammas / likelihood
-        ll = np.sum(gammas.T @ np.log(likelihood), axis= 0)[0]
-        # print(ll)
-        # print(type(ll))
-        return float(ll)
+        log = np.sum(ma.log(gammas).data, axis=1).reshape(len(x), 1)
+        ll = np.sum(log, axis= 0)[0]
 
+        return float(ll)

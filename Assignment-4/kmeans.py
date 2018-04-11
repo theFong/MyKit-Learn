@@ -119,13 +119,17 @@ class KMeansClassifier():
 
         k_means = KMeans(self.n_cluster, max_iter=self.max_iter, e=self.e)
         centroids, memberships, _ = k_means.fit(x)
-        centroid_quorem = np.zeros((self.n_cluster, self.n_cluster))
-        for yn, m in zip(y, memberships):
-            centroid_quorem[m][yn] += 1
+        
+        centroid_labels_buckets = [[0] for l in range(self.n_cluster)]
 
-        centroid_labels = np.array([ np.argmax(c) for c in centroid_quorem ])
+        for i, yi in enumerate(y):
+            centroid_labels_buckets[memberships[i]].append(yi)
 
-        self.centroid_labels = centroid_labels
+        centroid_labels = []
+        for u in centroid_labels_buckets:
+            centroid_labels.append(np.bincount(u).argmax()) 
+
+        self.centroid_labels = np.array(centroid_labels) 
         self.centroids = centroids
 
         assert self.centroid_labels.shape == (self.n_cluster,), 'centroid_labels should be a vector of shape {}'.format(
@@ -148,10 +152,16 @@ class KMeansClassifier():
 
         np.random.seed(42)
         N, D = x.shape
+        predictions = []
+        for xn in x:
+            min_distance_ind = np.argmin([ np.power(la.norm(xn - u), .5) for u in self.centroids ])
+            predictions.append(self.centroid_labels[min_distance_ind])
 
-        return np.array([ self.centroid_labels[self.calc_nearest_centroid(xn)] for xn in x ])
+        return np.array(predictions)
 
-    def calc_nearest_centroid(self, xn):
-        euclidean_distances = [ la.norm(self.centroids - u) for u in self.centroids ]
-        centroid = np.argmin(euclidean_distances)
-        return centroid
+        # return np.arrays([ self.centroid_labels[self.calc_nearest_centroid(xn)] for xn in x ])
+
+    # def calc_nearest_centroid(self, xn):
+    #     euclidean_distances = [ la.norm(self.centroids - u) for u in self.centroids ]
+    #     centroid = np.argmin(euclidean_distances)
+    #     return centroid

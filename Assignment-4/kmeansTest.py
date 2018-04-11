@@ -141,7 +141,7 @@ def kmeans_classification():
 
     classifier.fit(x_train, y_train)
     y_hat_test = classifier.predict(x_test)
-
+    print(y_test.shape)
     assert y_hat_test.shape == y_test.shape, \
         'y_hat_test and y_test should have same shape'
 
@@ -166,5 +166,5 @@ def kmeans_classification():
 
 if __name__ == '__main__':
     kmeans_toy()
-    kmeans_image_compression()
+    # kmeans_image_compression()
     kmeans_classification()
