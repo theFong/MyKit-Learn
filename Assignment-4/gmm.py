@@ -3,6 +3,7 @@ import numpy.linalg as la
 from numpy import ma
 from kmeans import KMeans
 import sys
+np.seterr(divide='ignore', invalid='ignore')
 
 
 
