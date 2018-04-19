@@ -19,10 +19,16 @@ def forward(pi, A, B, O):
   S = len(pi)
   N = len(O)
   alpha = np.zeros([S, N])
-  ###################################################
-  # Q3.1 Edit here
-  ###################################################
+  alpha_ = np.zeros([S,N+1])
+  
+  # initialize using pi
+  for i in range(S):
+    alpha_[i,0] = pi[i]
 
+  for k in range(1,N+1):
+    alpha_[:,k] = ( alpha_[:,k-1] * B[:,O[k-1]] @ A )
+
+  alpha = alpha_[:,1:]
   return alpha
 
 
@@ -59,10 +65,7 @@ def seqprob_forward(alpha):
   - prob: A float number of P(x_1:x_T)
   """
   prob = 0
-  ###################################################
-  # Q3.2 Edit here
-  ###################################################
-  
+  prob = np.sum( alpha[:,(alpha.shape[1])-1] )
   return prob
 
 
@@ -80,7 +83,7 @@ def seqprob_backward(beta, pi, B, O):
   Returns:
   - prob: A float number of P(x_1:x_T)
   """
-  prob = 0
+  prob = 1
   ###################################################
   # Q3.2 Edit here
   ###################################################
@@ -105,7 +108,32 @@ def viterbi(pi, A, B, O):
   ###################################################
   # Q3.3 Edit here
   ###################################################
+  S = len(pi)
+  N = len(O)
+  gamma = np.zeros([S, N])
+  path_matrix = np.zeros([S, N])
   
+  # initialize using pi
+  for i in range(S):
+    gamma[i,0] = pi[i] * B[i,O[0]]
+
+  for k in range(1,N):
+    for i in range(S):
+      prob = []
+      # calc all values
+      for j in range(S):
+        prob.append( gamma[j,k-1] * A[i,j] * B[i,O[k]] )
+      # max
+      gamma[i,k] = max(prob)
+      path_matrix[i,k] = np.argmax(prob)
+  
+  # add max index of last column of gamma
+  path.append( np.argmax(gamma[:,(path_matrix.shape[1])-1]))
+  for path_i, path_matrix_i in enumerate(range(N-1,-1,-1)):
+    # add index of path_matrix with which the prev path points to
+    path.append(int(path_matrix[path[path_i], path_matrix_i])) 
+
+  path.reverse()
   return path
 
 

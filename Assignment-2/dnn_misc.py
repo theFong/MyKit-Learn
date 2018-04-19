@@ -185,8 +185,7 @@ class relu:
         """
 
         ##########################################################################################################################
-        # backward_output = ? (A numpy array of the shape of X, the gradient of the mini-batch loss w.r.t. X)                    #
-        # PLEASE follow the Heaviside step function defined in CSCI567_HW2.pdf                                                   #
+        # backward_output = (A numpy array of the shape of X, the gradient of the mini-batch loss w.r.t. X)                    ##
         ##########################################################################################################################
         backward_output = grad * self.mask
         assert(X.shape == backward_output.shape)
@@ -271,13 +270,6 @@ class dropout:
         assert(X.shape == backward_output.shape)
 
         return backward_output
-
-
-
-    ###########################################################################
-    #          Please DO NOT change the following parts of the script         #
-    ###########################################################################
-
 
 class conv_layer:
 

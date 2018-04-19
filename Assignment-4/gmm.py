@@ -122,13 +122,6 @@ class GMM():
         pdf = (1 / np.sqrt( np.power(2*np.pi, xi.shape[0]) * la.det(vark)) ) * np.exp( -(1 / 2) * ((xi - uk).T @ la.inv(vark) @ (xi - uk)) )
         return pdf
 
-    # while np.linalg.matrix_rank(self.variances[k]) != self.variances[k].shape[0]:
-    #         self.variances[k] += 1e-3 * np.identity(self.variances.shape)
-
-    #     l = 1 / np.sqrt(((2 * np.pi) ** len(x)) * np.linalg.det(self.variances[k]))
-    #     r = np.exp((-0.5) * (x - self.means[k]) @ np.linalg.inv(self.variances[k]) @ (x - self.means[k]).T)
-    #     return l * r
-
     def sample(self, N):
         '''
         sample from the GMM model
@@ -145,9 +138,9 @@ class GMM():
         # - generate samples from the GMM
         # - return the samples
         s = []
-        for n in range(N):
-            k = np.random.randint(self.n_cluster)
-            s.append(np.random.multivariate_normal(self.means[k], self.variances[k]))
+        k = np.random.choice(self.n_cluster, N, p=self.pi_k.tolist)
+        for kn in k:
+            s.append(np.random.multivariate_normal(self.means[kn], self.variances[kn]))
         return np.array(s)
 
     def compute_log_likelihood(self, x):
