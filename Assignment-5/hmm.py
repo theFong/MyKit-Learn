@@ -19,11 +19,12 @@ def forward(pi, A, B, O):
   S = len(pi)
   N = len(O)
   alpha = np.zeros([S, N])
+  # alpha 
   alpha_ = np.zeros([S,N+1])
   
   # initialize using pi
-  for i in range(S):
-    alpha_[i,0] = pi[i]
+  # add pi to first column of alpha_
+  alpha_[:,0] = pi
 
   for k in range(1,N+1):
     alpha_[:,k] = ( alpha_[:,k-1] * B[:,O[k-1]] @ A )
@@ -48,10 +49,23 @@ def backward(pi, A, B, O):
   S = len(pi)
   N = len(O)
   beta = np.zeros([S, N])
-  ###################################################
-  # Q3.1 Edit here
-  ###################################################
+
+  # alpha 
+  beta_ = np.zeros([S,N+1])
   
+  # initialize using pi
+  # add pi to first column of alpha_
+  beta_[:,N] = [1 / S] * S
+
+  for k in range(N-1, -1, -1):
+    # print(beta_[:,k+1])
+    beta_[:,k] = ( beta_[:,k+1] * B[:,O[k]] @ A.T )
+
+  beta = beta_[:,:N]
+  
+  # print(beta)
+  prob = np.sum( beta[:,0] )
+  print(prob)
   return beta
 
 def seqprob_forward(alpha):
@@ -83,7 +97,7 @@ def seqprob_backward(beta, pi, B, O):
   Returns:
   - prob: A float number of P(x_1:x_T)
   """
-  prob = 1
+  prob = 0
   ###################################################
   # Q3.2 Edit here
   ###################################################

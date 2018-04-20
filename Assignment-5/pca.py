@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.linalg as la
 
 def pca(X = np.array([]), no_dims = 50):
     """
@@ -20,8 +21,19 @@ def pca(X = np.array([]), no_dims = 50):
     Y = np.array([])
     M = np.array([])
 
-    """TODO: write your code here"""
-    
+    cov_mat = np.cov(X.T)
+    eig_vals, eig_vecs = la.eigh(cov_mat)
+    # l2 normalize of each eig vec
+    eig_vec_norms = np.array([ la.norm(e) for e in eig_vecs.T ])
+    eig_vecs /= eig_vec_norms
+    # tuple of eigen values and their respective vector
+    eig_pairs = [ (e_val, e_vec) for e_val, e_vec in zip(eig_vals, eig_vecs.T) ]
+    # sort largest to smallest based on eigen values 
+    eig_pairs.sort(key = lambda pair : pair[0], reverse = True)
+    # select top no_dims
+    M = np.array([ e[1] for e,_ in zip(eig_pairs, range(no_dims)) ]).T
+    # transform
+    Y = X @ M
     return Y, M
 
 def decompress(Y = np.array([]), M = np.array([])):
@@ -41,7 +53,7 @@ def decompress(Y = np.array([]), M = np.array([])):
     """
     X_hat = np.array([])
 
-    """TODO: write your code here"""
+    X_hat = Y @ M.T
     
     return X_hat
 
@@ -55,7 +67,7 @@ def reconstruction_error(orig = np.array([]), decompressed = np.array([])):
     """
     error = 0
 
-    """TODO: write your code here"""
+    error = ((orig - decompressed) ** 2).mean(axis=None)
     
     return error
 
