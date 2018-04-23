@@ -49,23 +49,11 @@ def backward(pi, A, B, O):
   S = len(pi)
   N = len(O)
   beta = np.zeros([S, N])
-
-  # alpha 
-  beta_ = np.zeros([S,N+1])
+  beta[:,N-1] = [1] * S
   
-  # initialize using pi
-  # add pi to first column of alpha_
-  beta_[:,N] = [1 / S] * S
+  for k in range(N-2, -1, -1):
+    beta[:,k] = (beta[:,k+1] * B[:,O[k+1]] @ A.T)
 
-  for k in range(N-1, -1, -1):
-    # print(beta_[:,k+1])
-    beta_[:,k] = ( beta_[:,k+1] * B[:,O[k]] @ A.T )
-
-  beta = beta_[:,:N]
-  
-  # print(beta)
-  prob = np.sum( beta[:,0] )
-  print(prob)
   return beta
 
 def seqprob_forward(alpha):
@@ -78,7 +66,6 @@ def seqprob_forward(alpha):
   Returns:
   - prob: A float number of P(x_1:x_T)
   """
-  prob = 0
   prob = np.sum( alpha[:,(alpha.shape[1])-1] )
   return prob
 
@@ -97,10 +84,9 @@ def seqprob_backward(beta, pi, B, O):
   Returns:
   - prob: A float number of P(x_1:x_T)
   """
-  prob = 0
-  ###################################################
-  # Q3.2 Edit here
-  ###################################################
+
+  beta[:,0] *= pi * B[:,O[0]]
+  prob = np.sum( beta[:,0] )
   
   return prob
 
@@ -124,25 +110,24 @@ def viterbi(pi, A, B, O):
   ###################################################
   S = len(pi)
   N = len(O)
-  gamma = np.zeros([S, N])
+  delta = np.zeros([S, N])
   path_matrix = np.zeros([S, N])
   
   # initialize using pi
   for i in range(S):
-    gamma[i,0] = pi[i] * B[i,O[0]]
+    delta[i,0] = pi[i] * B[i,O[0]]
 
   for k in range(1,N):
     for i in range(S):
       prob = []
       # calc all values
       for j in range(S):
-        prob.append( gamma[j,k-1] * A[i,j] * B[i,O[k]] )
+        prob.append( delta[j,k-1] * A[i,j] * B[i,O[k]] )
       # max
-      gamma[i,k] = max(prob)
+      delta[i,k] = max(prob)
       path_matrix[i,k] = np.argmax(prob)
-  
   # add max index of last column of gamma
-  path.append( np.argmax(gamma[:,(path_matrix.shape[1])-1]))
+  path.append( np.argmax(delta[:,(path_matrix.shape[1])-1]))
   for path_i, path_matrix_i in enumerate(range(N-1,-1,-1)):
     # add index of path_matrix with which the prev path points to
     path.append(int(path_matrix[path[path_i], path_matrix_i])) 
