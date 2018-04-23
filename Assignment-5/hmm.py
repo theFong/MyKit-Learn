@@ -127,8 +127,8 @@ def viterbi(pi, A, B, O):
       delta[i,k] = max(prob)
       path_matrix[i,k] = np.argmax(prob)
   # add max index of last column of gamma
-  path.append( np.argmax(delta[:,(path_matrix.shape[1])-1]))
-  for path_i, path_matrix_i in enumerate(range(N-1,-1,-1)):
+  path.append( np.argmax(delta[:,N-1]))
+  for path_i, path_matrix_i in enumerate(range(N-2,-1,-1)):
     # add index of path_matrix with which the prev path points to
     path.append(int(path_matrix[path[path_i], path_matrix_i])) 
 
@@ -136,7 +136,6 @@ def viterbi(pi, A, B, O):
   return path
 
 
-##### DO NOT MODIFY ANYTHING BELOW THIS ###################
 def main():
   model_file = sys.argv[1]
   Osymbols = sys.argv[2]
