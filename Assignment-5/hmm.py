@@ -122,10 +122,11 @@ def viterbi(pi, A, B, O):
       prob = []
       # calc all values
       for j in range(S):
-        prob.append( delta[j,k-1] * A[i,j] * B[i,O[k]] )
+        prob.append( delta[j,k-1] * A[j,i] * B[i,O[k]] )
       # max
       delta[i,k] = max(prob)
       path_matrix[i,k] = np.argmax(prob)
+  print(delta)
   # add max index of last column of gamma
   path.append( np.argmax(delta[:,N-1]))
   for path_i, path_matrix_i in enumerate(range(N-2,-1,-1)):
