@@ -5,11 +5,6 @@ from typing import List, Callable
 import numpy
 import scipy
 
-
-############################################################################
-# DO NOT MODIFY ABOVE CODES
-############################################################################
-
 class KNN:
 
     def __init__(self, k: int, distance_function) -> float:

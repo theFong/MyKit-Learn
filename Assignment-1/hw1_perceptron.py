@@ -56,8 +56,7 @@ class Perceptron:
                     self.w = np.array(self.w) + ((y * x) / (x_norm + self.margin))
                     is_terminate = False
 
-        return False
-            
+        return False     
     
     def reset(self):
         self.w = [0 for i in range(0,self.nb_features+1)]
@@ -76,7 +75,6 @@ class Perceptron:
         # weights to predict the label
         ############################################################################
         return np.sign(np.inner(self.w.transpose(),features))
-
 
     def get_weights(self) -> Tuple[List[float], float]:
         return self.w

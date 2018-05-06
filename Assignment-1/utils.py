@@ -90,12 +90,7 @@ class NormalizationScaler:
 
 class MinMaxScaler:
     """
-    You should keep some states inside the object.
-    You can assume that the parameter of the first __call__
-        must be the training set.
-
-    Note:
-        1. you may assume the parameters are valid when __call__
+    I am assuming the parameters are valid when __call__
             is being called the first time (you can find min and max).
 
     Example:
