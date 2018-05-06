@@ -5,11 +5,6 @@ from typing import List
 import numpy
 import scipy
 
-
-############################################################################
-# DO NOT MODIFY ABOVE CODES
-############################################################################
-
 class LinearRegression:
     def __init__(self, nb_features: int):
         self.nb_features = nb_features
