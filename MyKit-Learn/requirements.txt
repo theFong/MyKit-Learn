@@ -1,0 +1,6 @@
+numpy==1.13.1
+scipy==0.19.1
+matplotlib==2.0.2
+scikit-learn==0.19.0
+jupyter
+Pillow==5.0.0
