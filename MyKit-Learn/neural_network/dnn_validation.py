@@ -1,7 +1,3 @@
-"""
-Do not change the input and output format.
-If our script cannot run your code or the format is improper, your code will not be graded.
-"""
 
 import numpy as np
 import dnn_misc
