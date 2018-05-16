@@ -6,9 +6,9 @@ Algorithm details can be found as Jupyter Notebooks in `MyKit-Learn/`
 - [x] Linear Regression
 - [x] k-Nearest Neighbor
 - [x] Perceptron
-- [ ] Logistic Regression
-- [ ] Multilayer Perceptron (MLP)
-- [ ] Convolutional Neural Network (CNN)
+- [x] Logistic Regression
+- [x] Multilayer Perceptron (MLP)
+- [x] Convolutional Neural Network (CNN)
 - [ ] Decsision Tree
 - [ ] LogitBoost
 - [ ] Adaboost

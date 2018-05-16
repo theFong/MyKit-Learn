@@ -30,7 +30,7 @@ def binary_train(X, y, w0=None, b0=None, step_size=0.5, max_iterations=1000):
     - b: scalar, which is the bias of logistic regression
 
     Find the optimal parameters w and b for inputs X and y.
-    Use the average of the gradients for all training examples to
+    average of the gradients for all training examples to
     update parameters.
     """
     
@@ -112,7 +112,7 @@ def multinomial_train(X, y, C,
     C is the number of classes and D is the dimensionality of features.
     - b: bias vector of length C, where C is the number of classes
 
-    Implement a multinomial logistic regression for multiclass 
+    Multinomial logistic regression for multiclass 
     classification. Keep in mind, that for this task you may need a 
     special (one-hot) representation of classification labels, where 
     each label y_i is represented as a row of zeros with a single 1 in
@@ -151,10 +151,6 @@ def multinomial_train(X, y, C,
             g = ( calc_gradient(w, Xn, Yn) / N )
             w = w - step_size * g
 
-        # update rule
-        
-        # update 
-
     b = w[:,D-1]
     assert w.shape == (C, D)
     assert b.shape == (C,)
@@ -178,7 +174,7 @@ def multinomial_predict(X, w, b):
     Outputted predictions should be from {0, C - 1}, where
     C is the number of classes
 
-    Make predictions for multinomial classifier.
+    Makes predictions for multinomial classifier.
     """
     X = np.append(X, [[1]]*len(X), axis=1)
     N, D = X.shape
@@ -213,7 +209,7 @@ def OVR_train(X, y, C, w0=None, b0=None, step_size=0.5, max_iterations=150):
     - w: a C-by-D weight matrix of OVR logistic regression
     - b: bias vector of length C
 
-    Implement multiclass classification using binary classifier and 
+    Multiclass classification using binary classifier and 
     one-versus-rest strategy. Recall, that the OVR classifier is 
     trained by training C different classifiers. 
     """
@@ -254,7 +250,7 @@ def OVR_predict(X, w, b):
     Outputted predictions should be from {0, C - 1}, where
     C is the number of classes.
 
-    Make predictions using OVR strategy and predictions from binary
+    Makes predictions using OVR strategy and predictions from binary
     classifier. 
     """
     N, D = X.shape
@@ -270,11 +266,6 @@ def OVR_predict(X, w, b):
 
     assert preds.shape == (N,)
     return preds
-
-
-#######################################################################
-# DO NOT MODIFY THE CODE BELOW 
-#######################################################################
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -322,20 +313,17 @@ def run_multiclass():
                 (toy_data_multiclass_5_classes(), 'Synthetic data', 5), 
                 (data_loader_mnist(), 'MNIST', 10)]
 
-    # datasets = [(toy_data_multiclass_3_classes_non_separable(), 
-    #                     'Synthetic data', 3)]
-
     for data, name, num_classes in datasets:
         print('%s: %d class classification' % (name, num_classes))
         X_train, X_test, y_train, y_test = data
         
-        # print('One-versus-rest:')
-        # w, b = OVR_train(X_train, y_train, C=num_classes)
-        # train_preds = OVR_predict(X_train, w=w, b=b)
-        # preds = OVR_predict(X_test, w=w, b=b)
-        # print('train acc: %f, test acc: %f' % 
-        #     (accuracy_score(y_train, train_preds),
-        #      accuracy_score(y_test, preds)))
+        print('One-versus-rest:')
+        w, b = OVR_train(X_train, y_train, C=num_classes)
+        train_preds = OVR_predict(X_train, w=w, b=b)
+        preds = OVR_predict(X_test, w=w, b=b)
+        print('train acc: %f, test acc: %f' % 
+            (accuracy_score(y_train, train_preds),
+             accuracy_score(y_test, preds)))
     
         print('Multinomial:')
         w, b = multinomial_train(X_train, y_train, C=num_classes)
