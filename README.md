@@ -12,7 +12,7 @@ Algorithm details can be found as Jupyter Notebooks in `MyKit-Learn/`
 - [ ] Decsision Tree
 - [ ] LogitBoost
 - [ ] Adaboost
-- [ ] Support Vector Machine (SVM)
+- [x] Support Vector Machine (SVM)
 - [ ] k-Means Clustering
 - [ ] Gaussian Mixture Model (GMM)
 - [ ] Hidden Markov Model (HMM)
