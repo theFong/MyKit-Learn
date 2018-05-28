@@ -13,8 +13,8 @@ Algorithm details can be found as Jupyter Notebooks in `MyKit-Learn/`
 - [x] LogitBoost
 - [x] Adaboost
 - [x] Support Vector Machine (SVM)
-- [ ] k-Means Clustering
-- [ ] Gaussian Mixture Model (GMM)
+- [x] k-Means Clustering
+- [x] Gaussian Mixture Model (GMM)
 - [ ] Hidden Markov Model (HMM)
 - [ ] Primary Component Analysis (PCA)
 - [ ] Latent Dirichlet Allocation (LDA)
