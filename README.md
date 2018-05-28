@@ -9,9 +9,9 @@ Algorithm details can be found as Jupyter Notebooks in `MyKit-Learn/`
 - [x] Logistic Regression
 - [x] Multilayer Perceptron (MLP)
 - [x] Convolutional Neural Network (CNN)
-- [ ] Decsision Tree
-- [ ] LogitBoost
-- [ ] Adaboost
+- [x] Decsision Tree
+- [x] LogitBoost
+- [x] Adaboost
 - [x] Support Vector Machine (SVM)
 - [ ] k-Means Clustering
 - [ ] Gaussian Mixture Model (GMM)
